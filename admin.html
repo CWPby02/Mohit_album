@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel — Mohit Album</title>
+  <meta name="description" content="Mohit Album Admin Panel — add, edit, and manage album listings.">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Admin-only styles */
+    .admin-header {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 0 5%;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+    }
+
+    .admin-header .nav-logo { font-family: var(--font-head); font-size: 1.4rem; font-weight: 700; }
+    .admin-header .nav-logo span { color: var(--gold); }
+
+    .admin-badge {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      border: 1px solid var(--border);
+      padding: 5px 14px;
+      border-radius: 100px;
+    }
+
+    .form-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .reset-btn {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      border-radius: 5px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: var(--font-body);
+      margin-top: 0.75rem;
+      width: 100%;
+    }
+    .reset-btn:hover { border-color: #ff5050; color: #ff5050; }
+  </style>
+</head>
+<body>
+
+<!-- ========== ADMIN HEADER ========== -->
+<header class="admin-header">
+  <a href="index.html" class="nav-logo">Mohit <span>Album</span></a>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <span class="admin-badge">🔐 Admin Panel</span>
+    <a href="index.html" class="btn btn-outline btn-sm">← View Site</a>
+  </div>
+</header>
+
+<!-- ========== ADMIN LAYOUT ========== -->
+<div class="admin-layout">
+
+  <!-- LEFT: Add Album Form -->
+  <aside class="admin-form-panel">
+    <h2>📸 Album Manager</h2>
+    <p>Add or edit albums. Changes are saved instantly and appear live on the gallery page.</p>
+
+    <form id="admin-form" novalidate>
+      <input type="hidden" id="edit-id" value="">
+
+      <div class="form-group">
+        <label for="album-title">Album Name *</label>
+        <input type="text" id="album-title" placeholder="e.g. Royal Wedding Collection" required>
+      </div>
+
+      <div class="form-group">
+        <label for="album-category">Category</label>
+        <select id="album-category">
+          <option value="Wedding">Wedding</option>
+          <option value="Pre-Wedding">Pre-Wedding</option>
+          <option value="Birthday">Birthday</option>
+          <option value="Baby">Baby</option>
+          <option value="Corporate">Corporate</option>
+          <option value="Graduation">Graduation</option>
+          <option value="Family">Family</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="img-url">Image URL *</label>
+        <input type="url" id="img-url" placeholder="https://example.com/photo.jpg" required>
+        <p class="form-hint">Tip: Use Unsplash URLs for high-quality free images</p>
+      </div>
+
+      <!-- Image Preview -->
+      <div class="preview-box" id="img-preview">
+        <span>Image preview will appear here</span>
+      </div>
+
+      <div class="form-group">
+        <label for="album-desc">Description (comma separated) *</label>
+        <textarea id="album-desc" rows="4"
+          placeholder="Premium cover,40 pages,HD print,Waterproof,Free name embossing"
+          required></textarea>
+        <p class="form-hint">Each item separated by a comma will become a bullet point on the album card.</p>
+      </div>
+
+      <!-- Features Preview -->
+      <div id="feat-preview" style="display:none;margin-bottom:1rem;">
+        <p style="font-size:0.72rem;color:var(--gold);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:0.5rem;">Preview:</p>
+      </div>
+
+      <button type="submit" class="btn btn-gold" style="width:100%;justify-content:center;">
+        ✚ Add Album
+      </button>
+
+      <button type="button" class="reset-btn" onclick="cancelEdit()">
+        ✕ Cancel / Reset Form
+      </button>
+    </form>
+
+    <!-- Danger zone -->
+    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);">
+      <h4 style="font-size:0.8rem;color:#ff5050;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.75rem;">⚠️ Danger Zone</h4>
+      <button class="reset-btn" onclick="resetToDefaults()" style="color:#ff5050;border-color:rgba(255,80,80,0.3);">
+        🔄 Reset All Albums to Defaults
+      </button>
+    </div>
+  </aside>
+
+  <!-- RIGHT: Album Grid -->
+  <main class="admin-albums-panel">
+    <h2>Manage Albums <span id="album-count">(0)</span></h2>
+    <div class="admin-grid" id="admin-grid">
+      <!-- Rendered by script.js -->
+    </div>
+  </main>
+
+</div>
+
+<!-- ========== FOOTER ========== -->
+<footer style="background:var(--bg2);border-top:1px solid var(--border);padding:1.5rem 5%;text-align:center;">
+  <p style="font-size:0.82rem;color:var(--text-muted);">
+    Mohit Album Admin Panel — Data saved in browser localStorage.
+    <a href="index.html" style="color:var(--gold);">View live site →</a>
+  </p>
+</footer>
+
+<script src="script.js"></script>
+<script>
+  function cancelEdit() {
+    document.getElementById('admin-form').reset();
+    document.getElementById('edit-id').value = '';
+    document.getElementById('img-preview').innerHTML = '<span>Image preview will appear here</span>';
+    document.getElementById('feat-preview').innerHTML = '';
+    document.getElementById('feat-preview').style.display = 'none';
+    const submitBtn = document.querySelector('#admin-form button[type="submit"]');
+    if (submitBtn) submitBtn.textContent = '✚ Add Album';
+  }
+
+  function resetToDefaults() {
+    if (!confirm('This will DELETE all albums and restore the default sample data. Are you sure?')) return;
+    localStorage.removeItem('mohit_albums');
+    renderAdminGrid();
+    showToast('Albums reset to defaults.', 'info');
+  }
+</script>
+</body>
+</html>
